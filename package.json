@@ -1,0 +1,29 @@
+{
+  "name": "opencode-mobile-ui",
+  "version": "1.0.0",
+  "description": "Mobile-friendly web UI for OpenCode AI coding agent",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite --host 0.0.0.0",
+    "server": "node src/server-manager.js"
+  },
+  "keywords": [
+    "opencode",
+    "ai",
+    "coding-agent",
+    "mobile",
+    "web-ui"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.4.0"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "dotenv": "^16.4.0"
+  }
+}
