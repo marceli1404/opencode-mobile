@@ -17,10 +17,20 @@ fi
 echo "Installing Node dependencies..."
 npm install
 
-# Configure OpenCode server credentials
+# Configure OpenCode server credentials.
+# A forwarded Codespace port can be reachable beyond your machine, so never
+# fall back to a shared, well-known default password. If none is provided,
+# generate a strong random one and print it once.
 if [ -z "$OPENCODE_SERVER_PASSWORD" ]; then
-  echo "⚠️  OPENCODE_SERVER_PASSWORD not set. Setting a default for development."
-  export OPENCODE_SERVER_PASSWORD="dev-password-123"
+  if command -v openssl >/dev/null 2>&1; then
+    OPENCODE_SERVER_PASSWORD="$(openssl rand -hex 24)"
+  else
+    OPENCODE_SERVER_PASSWORD="$(head -c 24 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 32)"
+  fi
+  export OPENCODE_SERVER_PASSWORD
+  echo "🔐 OPENCODE_SERVER_PASSWORD was not set — generated a random one:"
+  echo "    $OPENCODE_SERVER_PASSWORD"
+  echo "   (saved to ~/.bashrc; store it in your password manager)"
   echo "# OpenCode Server Configuration" >> ~/.bashrc
   echo "export OPENCODE_SERVER_PASSWORD=\"$OPENCODE_SERVER_PASSWORD\"" >> ~/.bashrc
   echo "export OPENCODE_SERVER_USERNAME=\"opencode\"" >> ~/.bashrc
