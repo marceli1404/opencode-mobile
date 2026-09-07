@@ -13,7 +13,7 @@ class OpenCodeServer {
     this.options = {
       port: options.port || 4096,
       hostname: options.hostname || '0.0.0.0',
-      password: options.password || process.env.OPENCODE_SERVER_PASSWORD || 'dev-password-123',
+      password: options.password || process.env.OPENCODE_SERVER_PASSWORD,
       username: options.username || process.env.OPENCODE_SERVER_USERNAME || 'opencode',
       cors: options.cors || [],
       ...options
@@ -70,6 +70,13 @@ class OpenCodeServer {
    * Start the OpenCode web server
    */
   async start() {
+    if (!this.options.password) {
+      throw new Error(
+        'No server password set. Provide options.password or set OPENCODE_SERVER_PASSWORD ' +
+        'to a strong value before starting the server.'
+      );
+    }
+
     const installed = await this.checkOpenCodeInstalled();
     if (!installed) {
       console.log('OpenCode not installed. Installing...');
