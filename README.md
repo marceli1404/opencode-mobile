@@ -119,7 +119,7 @@ npm start
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `OPENCODE_PORT` | OpenCode server port | `4096` |
-| `OPENCODE_HOSTNAME` | Server bind address | `0.0.0.0` |
+| `OPENCODE_HOSTNAME` | Server bind address | `127.0.0.1` |
 | `OPENCODE_SERVER_USERNAME` | Auth username | `opencode` |
 | `OPENCODE_SERVER_PASSWORD` | Auth password (**required**) | - |
 | `OPENCODE_CORS` | Allowed CORS origins (comma-separated) | - |
@@ -135,7 +135,8 @@ Add these in **Settings → Secrets and variables → Codespaces**:
 - Always set a strong `OPENCODE_SERVER_PASSWORD`
 - Use HTTPS (automatically provided by Codespaces)
 - Keep CORS origins restricted
-- Clear credentials when not in use
+- Passwords are kept in memory only and are not persisted to `localStorage`; reloads require re-entry
+- Keep the default `127.0.0.1` bind unless you intentionally place the server behind a private/authenticated network boundary
 
 ## Testing
 

@@ -768,17 +768,18 @@ class OpenCodeUI {
     this.api.username = username;
     this.api.password = password;
 
-    // Save to localStorage
+    // Persist only non-sensitive settings. The password remains in memory
+    // for this page lifetime and is removed from legacy localStorage.
     localStorage.setItem('opencode-url', url);
     localStorage.setItem('opencode-username', username);
-    localStorage.setItem('opencode-password', password);
+    localStorage.removeItem('opencode-password');
 
     // Apply theme
     document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
     localStorage.setItem('opencode-theme', darkMode ? 'dark' : 'light');
 
     this.hideModal();
-    this.showToast('Settings saved', 'success');
+    this.showToast('Settings saved. Password will be forgotten when this page reloads.', 'success');
 
     // Reconnect
     this.loadSessions();

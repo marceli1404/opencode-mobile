@@ -10,6 +10,7 @@ const command = process.argv[2] || 'start';
 const port = parseInt(process.env.OPENCODE_PORT || process.argv[3] || '4096', 10);
 const password = process.env.OPENCODE_SERVER_PASSWORD;
 const username = process.env.OPENCODE_SERVER_USERNAME || 'opencode';
+const hostname = process.env.OPENCODE_HOSTNAME || '127.0.0.1';
 
 if (!password) {
   console.error('❌ OPENCODE_SERVER_PASSWORD environment variable is required');
@@ -19,6 +20,7 @@ if (!password) {
 
 const server = new OpenCodeServer({
   port,
+  hostname,
   password,
   username,
   cors: (process.env.OPENCODE_CORS || '').split(',').filter(Boolean)
@@ -28,11 +30,15 @@ async function main() {
   switch (command) {
     case 'start':
       await server.start();
-      console.log('\n📱 Access OpenCode mobile UI at:');
-      console.log(`   http://localhost:${port}`);
-      console.log(`\n🔐 Credentials:`);
-      console.log(`   Username: ${username}`);
-      console.log(`   Password: ${password}`);
+      const displayHost = ['0.0.0.0', '::'].includes(hostname) ? 'localhost' : hostname;
+      console.log('\n📱 OpenCode server:');
+      console.log(`   http://${displayHost}:${port}`);
+      console.log(`\n🔐 Username: ${username}`);
+      
+      console.log('   Password: configured via OPENCODE_SERVER_PASSWORD (not displayed)');
+      if (!['127.0.0.1', '::1', 'localhost'].includes(hostname)) {
+        console.warn('⚠️  OpenCode is bound beyond loopback. Only do this behind an authenticated/private network boundary.');
+      }
       console.log('\nPress Ctrl+C to stop\n');
       
       // Keep process alive
