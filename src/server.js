@@ -3,10 +3,10 @@
  * Starts and manages the OpenCode web server
  */
 
-const { exec, spawn } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
+import { spawn } from 'node:child_process';
+import path from 'node:path';
+import fs from 'node:fs';
+import os from 'node:os';
 
 class OpenCodeServer {
   constructor(options = {}) {
@@ -28,9 +28,13 @@ class OpenCodeServer {
    */
   checkOpenCodeInstalled() {
     return new Promise((resolve) => {
-      exec('opencode --version', (error) => {
-        resolve(!error);
+      const openCodePath = this.getOpenCodePath();
+      const child = spawn(openCodePath, ['--version'], {
+        stdio: 'ignore',
+        shell: process.platform === 'win32' && openCodePath.endsWith('.cmd')
       });
+      child.once('error', () => resolve(false));
+      child.once('exit', (code) => resolve(code === 0));
     });
   }
 
@@ -134,51 +138,27 @@ class OpenCodeServer {
   }
 
   /**
-   * Install OpenCode
-   */
-  installOpenCode() {
-    return new Promise((resolve, reject) => {
-      const install = spawn('bash', ['-c', 'curl -fsSL https://opencode.ai/install | bash'], {
-        stdio: 'inherit',
-        shell: false
-      });
-
-      install.on('exit', (code) => {
-        if (code === 0) {
-          console.log('OpenCode installed successfully');
-          resolve();
-        } else {
-          reject(new Error('Failed to install OpenCode'));
-        }
-      });
-    });
-  }
-
-  /**
    * Wait for server to be ready
    */
-  waitForServer() {
-    return new Promise((resolve) => {
-      const timeout = 10000;
-      const start = Date.now();
-      
-      const check = setInterval(() => {
-        const port = this.options.port;
-        const { exec } = require('child_process');
-        
-        exec(`curl -s http://${this.options.hostname}:${port}/doc`, (error, stdout) => {
-          if (!error && stdout) {
-            clearInterval(check);
-            console.log(`✅ OpenCode server ready at http://${this.options.hostname}:${port}`);
-            resolve();
-          } else if (Date.now() - start > timeout) {
-            clearInterval(check);
-            console.log('⚠️  Server not ready within timeout, but may still be starting...');
-            resolve();
-          }
-        });
-      }, 1000);
-    });
+  async waitForServer() {
+    const timeout = 10000;
+    const start = Date.now();
+    const url = `http://${this.options.hostname}:${this.options.port}/doc`;
+
+    while (Date.now() - start <= timeout) {
+      try {
+        const response = await fetch(url, { signal: AbortSignal.timeout(1500) });
+        if (response.ok) {
+          console.log(`✅ OpenCode server ready at http://${this.options.hostname}:${this.options.port}`);
+          return;
+        }
+      } catch {
+        // Server is still starting.
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    console.log('⚠️  Server not ready within timeout, but may still be starting...');
   }
 
   /**
@@ -205,5 +185,4 @@ class OpenCodeServer {
   }
 }
 
-// Export for CommonJS
-module.exports = { OpenCodeServer }; 
+export { OpenCodeServer }; 
