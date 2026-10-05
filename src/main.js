@@ -11,11 +11,13 @@ class App {
 
   async init() {
     try {
-      // Check for saved settings
+      // Restore non-sensitive settings only. Passwords are deliberately kept
+      // in memory and must be re-entered after a reload.
+      localStorage.removeItem('opencode-password'); // purge legacy plaintext storage
       const savedConfig = {
         url: localStorage.getItem('opencode-url'),
         username: localStorage.getItem('opencode-username') || 'opencode',
-        password: localStorage.getItem('opencode-password') || ''
+        password: ''
       };
 
       // Restore theme
