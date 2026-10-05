@@ -15,8 +15,11 @@ class App {
       const savedConfig = {
         url: localStorage.getItem('opencode-url'),
         username: localStorage.getItem('opencode-username') || 'opencode',
-        password: localStorage.getItem('opencode-password') || ''
+        password: ''
       };
+
+      // Remove credentials stored by older versions. Passwords now stay in memory only.
+      localStorage.removeItem('opencode-password');
 
       // Restore theme
       const savedTheme = localStorage.getItem('opencode-theme');

@@ -3,8 +3,8 @@
  * Run: node src/server-manager.js [start|stop|status]
  */
 
-const { OpenCodeServer } = require('./server.js');
-require('dotenv').config();
+import { OpenCodeServer } from './server.js';
+import 'dotenv/config';
 
 const command = process.argv[2] || 'start';
 const port = parseInt(process.env.OPENCODE_PORT || process.argv[3] || '4096', 10);
@@ -32,7 +32,7 @@ async function main() {
       console.log(`   http://localhost:${port}`);
       console.log(`\n🔐 Credentials:`);
       console.log(`   Username: ${username}`);
-      console.log(`   Password: ${password}`);
+      console.log('   Password: configured via OPENCODE_SERVER_PASSWORD');
       console.log('\nPress Ctrl+C to stop\n');
       
       // Keep process alive

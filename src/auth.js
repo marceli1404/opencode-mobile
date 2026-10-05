@@ -6,15 +6,16 @@
 class Auth {
   constructor() {
     this.storageKey = 'opencode-auth';
+    this.password = null;
   }
 
   /**
    * Store credentials
    */
   saveCredentials(username, password) {
+    this.password = password;
     const credentials = {
       username,
-      password: this.encode(password),
       timestamp: new Date().toISOString()
     };
     localStorage.setItem(this.storageKey, JSON.stringify(credentials));
@@ -27,9 +28,10 @@ class Auth {
     try {
       const data = JSON.parse(localStorage.getItem(this.storageKey));
       if (!data) return null;
+      if (!this.password) return null;
       return {
         username: data.username,
-        password: this.decode(data.password),
+        password: this.password,
         timestamp: data.timestamp
       };
     } catch (e) {
@@ -41,6 +43,7 @@ class Auth {
    * Clear credentials
    */
   clearCredentials() {
+    this.password = null;
     localStorage.removeItem(this.storageKey);
   }
 
@@ -49,20 +52,6 @@ class Auth {
    */
   isAuthenticated() {
     return this.getCredentials() !== null;
-  }
-
-  /**
-   * Encode password (obfuscation, not encryption)
-   */
-  encode(text) {
-    return btoa(encodeURIComponent(text));
-  }
-
-  /**
-   * Decode password
-   */
-  decode(encoded) {
-    return decodeURIComponent(atob(encoded));
   }
 
   /**

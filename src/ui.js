@@ -731,7 +731,7 @@ class OpenCodeUI {
           </div>
           <div class="form-group">
             <label for="settings-password">Password</label>
-            <input type="password" id="settings-password" class="form-input" placeholder="••••••••">
+            <input type="password" id="settings-password" class="form-input" placeholder="Not stored — re-enter after reload" autocomplete="current-password">
           </div>
           <div class="form-group">
             <label>
@@ -771,7 +771,7 @@ class OpenCodeUI {
     // Save to localStorage
     localStorage.setItem('opencode-url', url);
     localStorage.setItem('opencode-username', username);
-    localStorage.setItem('opencode-password', password);
+    localStorage.removeItem('opencode-password');
 
     // Apply theme
     document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
