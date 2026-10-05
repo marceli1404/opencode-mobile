@@ -4,6 +4,7 @@
  */
 
 const { exec, spawn } = require('child_process');
+const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -145,14 +146,24 @@ class OpenCodeServer {
       
       const check = setInterval(() => {
         const port = this.options.port;
-        const { exec } = require('child_process');
-        
-        exec(`curl -s http://${this.options.hostname}:${port}/doc`, (error, stdout) => {
-          if (!error && stdout) {
+        const healthHost = ['0.0.0.0', '::'].includes(this.options.hostname) ? '127.0.0.1' : this.options.hostname;
+
+        const healthRequest = http.get({
+          hostname: healthHost,
+          port,
+          path: '/doc',
+          timeout: 1000
+        }, (response) => {
+          response.resume();
+          if (response.statusCode && response.statusCode < 500) {
             clearInterval(check);
-            console.log(`✅ OpenCode server ready at http://${this.options.hostname}:${port}`);
+            console.log(`✅ OpenCode server ready at http://${healthHost}:${port}`);
             resolve();
-          } else if (Date.now() - start > timeout) {
+          }
+        });
+        healthRequest.on('timeout', () => healthRequest.destroy());
+        healthRequest.on('error', () => {
+          if (Date.now() - start > timeout) {
             clearInterval(check);
             console.log('⚠️  Server not ready within timeout, but may still be starting...');
             resolve();
