@@ -32,7 +32,7 @@ async function main() {
       console.log(`   http://localhost:${port}`);
       console.log(`\n🔐 Credentials:`);
       console.log(`   Username: ${username}`);
-      console.log(`   Password: ${password}`);
+      console.log('   Password: configured via OPENCODE_SERVER_PASSWORD');
       console.log('\nPress Ctrl+C to stop\n');
       
       // Keep process alive
