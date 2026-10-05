@@ -55,20 +55,6 @@ class Auth {
   }
 
   /**
-   * Encode password (obfuscation, not encryption)
-   */
-  encode(text) {
-    return btoa(encodeURIComponent(text));
-  }
-
-  /**
-   * Decode password
-   */
-  decode(encoded) {
-    return decodeURIComponent(atob(encoded));
-  }
-
-  /**
    * Verify server connection with credentials
    */
   async verifyConnection(baseUrl, username, password) {
